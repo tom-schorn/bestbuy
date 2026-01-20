@@ -9,8 +9,8 @@ product_list = [
 ]
 best_buy = store.Store(product_list)
 
-
-if __name__ == "__main__":
+def start(store_object):
+    """Starts the application."""
     while True:
         print("\nWelcome to Best Buy!")
         print("1. List all products in store")
@@ -22,29 +22,40 @@ if __name__ == "__main__":
             choice = input("Please enter your choice (1-4): ")
 
             if choice == '1':
-                for prod in best_buy.get_all_products():
+                for prod in [product for product in store_object.get_all_products() if product.quantity >= 1]:
                     prod.show()
+                print("\n\n")
 
             elif choice == '2':
-                total_quantity = best_buy.get_total_quantity()
+                total_quantity = store_object.get_total_quantity()
                 print(f"Total quantity of all products in store: {total_quantity}")
 
             elif choice == '3':
                 shopping_list = []
                 while True:
+                    for prod in [product for product in store_object.get_all_products() if product.quantity >= 1]:
+                        prod.show()
+                    print("\n\n")
+
                     prod_name = input("Enter product name to add to your order (or 'done' to finish): ")
                     if prod_name.lower() == 'done':
                         break
                     amount = int(input(f"Enter amount of {prod_name} to order: "))
+                    while amount <= 0:
+                        print("Invalid amount. Please enter a positive number.")
+                        amount = int(input(f"Enter amount of {prod_name} to order: "))
+
                     # find product by name
-                    product = next((p for p in best_buy.get_all_products() if p.name == prod_name), None)
-                    if product:
+                    product = next((p for p in store_object.get_all_products() if p.name == prod_name), None)
+                    if product and product.quantity >= amount:
                         shopping_list.append((product, amount))
+                    elif product.quantity < amount:
+                        print(f"Insufficient quantity of {prod_name} in stock.")
                     else:
                         print(f"Product {prod_name} not found or inactive.")
 
                 try:
-                    total_cost = best_buy.order(shopping_list)
+                    total_cost = store_object.order(shopping_list)
                     print(f"Your order has been processed. Total cost: {total_cost} €")
                 except ValueError as e:
                     print(f"Error processing order: {e}")
@@ -55,3 +66,6 @@ if __name__ == "__main__":
 
         except Exception as e:
             print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    start(best_buy)
