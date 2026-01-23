@@ -13,6 +13,8 @@ class Product:
         """Sets the quantity of the product in stock."""
         if quantity >= 0:
             self.quantity = quantity
+            if self.quantity == 0:
+                self.deactivate()
         else:
             raise ValueError("Quantity cannot be negative")
         
@@ -38,8 +40,9 @@ class Product:
     def buy(self, amount):
         """Processes the purchase of a given amount of the product."""
         if amount <= self.quantity:
-            
             self.quantity -= amount
+            if self.quantity == 0:
+                self.deactivate()
             return amount * self.price
         else:
             raise ValueError("Not enough quantity in stock")
